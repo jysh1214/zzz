@@ -650,7 +650,7 @@ impl SessionState {
 }
 
 pub fn start_server(mut os_input: Box<dyn ServerOsApi>, socket_path: PathBuf) {
-    info!("Starting Zellij server!");
+    info!("Starting Zzz server!");
 
     #[cfg(unix)]
     {
@@ -1606,7 +1606,7 @@ pub fn start_server(mut os_input: Box<dyn ServerOsApi>, socket_path: PathBuf) {
                     );
                 } else {
                     // TODO: test this
-                    log::error!("Cannot start web server: this instance of Zellij was compiled without web_server_capability");
+                    log::error!("Cannot start web server: this instance of Zzz was compiled without web_server_capability");
                 }
             },
             ServerInstruction::ShareCurrentSession(_client_id) => {
@@ -1627,7 +1627,7 @@ pub fn start_server(mut os_input: Box<dyn ServerOsApi>, socket_path: PathBuf) {
                             .unwrap();
                     }
                 } else {
-                    log::error!("Cannot share session: this instance of Zellij was compiled without web_server_capability");
+                    log::error!("Cannot share session: this instance of Zzz was compiled without web_server_capability");
                 }
             },
             ServerInstruction::StopSharingCurrentSession(_client_id) => {
@@ -1683,7 +1683,7 @@ pub fn start_server(mut os_input: Box<dyn ServerOsApi>, socket_path: PathBuf) {
                     }
                 } else {
                     // TODO: test this
-                    log::error!("Cannot start web server: this instance of Zellij was compiled without web_server_capability");
+                    log::error!("Cannot start web server: this instance of Zzz was compiled without web_server_capability");
                 }
             },
             ServerInstruction::WebServerStarted(base_url) => {

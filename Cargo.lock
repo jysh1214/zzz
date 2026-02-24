@@ -5181,32 +5181,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "zellij"
-version = "0.44.0"
-dependencies = [
- "anyhow",
- "clap",
- "dialoguer",
- "humantime",
- "insta",
- "interprocess",
- "isahc",
- "log",
- "miette",
- "names",
- "nix 0.23.1",
- "rand 0.8.5",
- "regex",
- "ssh2",
- "suggest",
- "thiserror 1.0.61",
- "vte 0.11.0",
- "zellij-client",
- "zellij-server",
- "zellij-utils",
-]
-
-[[package]]
 name = "zellij-client"
 version = "0.44.0"
 dependencies = [
@@ -5469,4 +5443,30 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.96",
+]
+
+[[package]]
+name = "zzz"
+version = "0.44.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "dialoguer",
+ "humantime",
+ "insta",
+ "interprocess",
+ "isahc",
+ "log",
+ "miette",
+ "names",
+ "nix 0.23.1",
+ "rand 0.8.5",
+ "regex",
+ "ssh2",
+ "suggest",
+ "thiserror 1.0.61",
+ "vte 0.11.0",
+ "zellij-client",
+ "zellij-server",
+ "zellij-utils",
 ]
