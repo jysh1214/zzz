@@ -24,20 +24,40 @@ impl ZellijPlugin for State {
             EventType::Timer,
             EventType::RunCommandResult,
             EventType::ModeUpdate,
+            EventType::FileSystemCreate,
+            EventType::FileSystemUpdate,
+            EventType::PaneUpdate,
         ]);
-        set_timeout(1.0);
+        set_timeout(10.0);
     }
 
     fn update(&mut self, event: Event) -> bool {
         match event {
             Event::Timer(_) => {
                 if self.visible {
-                    self.update_cwd();
-                    self.read_work_file();
-                    self.read_git_branch();
-                    self.read_git_commit();
+                    self.refresh_all();
                 }
-                set_timeout(1.0);
+                set_timeout(10.0);
+                false
+            },
+            Event::PaneUpdate(_) => {
+                if self.visible {
+                    self.refresh_all();
+                }
+                false
+            },
+            Event::FileSystemCreate(paths) | Event::FileSystemUpdate(paths) => {
+                if self.visible {
+                    let specrate = Self::has_specrate_path(&paths);
+                    let git = Self::has_git_path(&paths);
+                    if specrate && git {
+                        self.refresh_all();
+                    } else if specrate {
+                        self.refresh_specrate();
+                    } else if git {
+                        self.refresh_git();
+                    }
+                }
                 false
             },
             Event::RunCommandResult(exit_code, stdout, _stderr, context) => {
@@ -109,10 +129,7 @@ impl ZellijPlugin for State {
         if pipe_message.name == "toggle" {
             self.visible = !self.visible;
             if self.visible {
-                self.update_cwd();
-                self.read_work_file();
-                self.read_git_branch();
-                self.read_git_commit();
+                self.refresh_all();
             }
             return true;
         }
@@ -169,6 +186,37 @@ impl ZellijPlugin for State {
 }
 
 impl State {
+    fn has_specrate_path(paths: &[(PathBuf, Option<FileMetadata>)]) -> bool {
+        paths.iter().any(|(p, _)| {
+            let s = p.to_string_lossy();
+            s.contains(".specrate/work") || s.contains(".specrate/changes/")
+        })
+    }
+
+    fn has_git_path(paths: &[(PathBuf, Option<FileMetadata>)]) -> bool {
+        paths.iter().any(|(p, _)| {
+            p.to_string_lossy().ends_with(".git/HEAD")
+        })
+    }
+
+    fn refresh_all(&mut self) {
+        self.update_cwd();
+        self.read_work_file();
+        self.read_git_branch();
+        self.read_git_commit();
+    }
+
+    fn refresh_specrate(&mut self) {
+        self.update_cwd();
+        self.read_work_file();
+    }
+
+    fn refresh_git(&mut self) {
+        self.update_cwd();
+        self.read_git_branch();
+        self.read_git_commit();
+    }
+
     fn update_cwd(&mut self) {
         if let Ok((_tab_index, pane_id)) = get_focused_pane_info() {
             if let Ok(cwd) = get_pane_cwd(pane_id) {
