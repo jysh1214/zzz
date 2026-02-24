@@ -61,8 +61,14 @@ If one is not available for your OS, you could download a prebuilt binary from t
 
 You can also install (compile) with `cargo`:
 
+```bash
+cargo xtask build --release && cp ./target/release/zzz ~/.cargo/bin
 ```
-cargo install --locked zellij
+
+or run it directly:
+
+```bash
+cargo xtask run
 ```
 
 #### Try Zellij without installing
