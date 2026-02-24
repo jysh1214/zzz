@@ -140,6 +140,7 @@ mod not_wasm {
             add_plugin!(assets, "multiple-select.wasm");
             add_plugin!(assets, "layout-manager.wasm");
             add_plugin!(assets, "link.wasm");
+            add_plugin!(assets, "zzz-status-bar.wasm");
             assets
         };
     }
