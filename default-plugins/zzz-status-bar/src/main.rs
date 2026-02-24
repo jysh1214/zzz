@@ -1,0 +1,224 @@
+use std::collections::BTreeMap;
+use std::path::PathBuf;
+use zellij_tile::prelude::*;
+
+#[derive(Default)]
+struct State {
+    visible: bool,
+    change_id: String,
+    ticket: String,
+    change_state: String,
+    git_branch: String,
+    git_commit: String,
+    mode_info: ModeInfo,
+    cwd: Option<PathBuf>,
+}
+
+register_plugin!(State);
+
+impl ZellijPlugin for State {
+    fn load(&mut self, _configuration: BTreeMap<String, String>) {
+        self.visible = false;
+        set_selectable(false);
+        subscribe(&[
+            EventType::Timer,
+            EventType::RunCommandResult,
+            EventType::ModeUpdate,
+        ]);
+        set_timeout(1.0);
+    }
+
+    fn update(&mut self, event: Event) -> bool {
+        match event {
+            Event::Timer(_) => {
+                if self.visible {
+                    self.update_cwd();
+                    self.read_work_file();
+                    self.read_git_branch();
+                    self.read_git_commit();
+                }
+                set_timeout(1.0);
+                false
+            },
+            Event::RunCommandResult(exit_code, stdout, _stderr, context) => {
+                let output = String::from_utf8_lossy(&stdout).trim().to_string();
+                let success = exit_code == Some(0) && !output.is_empty();
+                let mut changed = false;
+                match context.get("type").map(|s| s.as_str()) {
+                    Some("work") => {
+                        if success {
+                            if self.change_id != output {
+                                changed = true;
+                                self.change_id = output.clone();
+                            }
+                            self.read_ticket_file(&output);
+                            self.read_state_file(&output);
+                        } else {
+                            changed = self.change_id != "-"
+                                || self.ticket != "-"
+                                || self.change_state != "-";
+                            self.change_id = "-".to_string();
+                            self.ticket = "-".to_string();
+                            self.change_state = "-".to_string();
+                        }
+                    },
+                    Some("ticket") => {
+                        let new_val = if success { output } else { "-".to_string() };
+                        if self.ticket != new_val {
+                            changed = true;
+                            self.ticket = new_val;
+                        }
+                    },
+                    Some("state") => {
+                        let new_val = if success { output } else { "-".to_string() };
+                        if self.change_state != new_val {
+                            changed = true;
+                            self.change_state = new_val;
+                        }
+                    },
+                    Some("git_branch") => {
+                        let new_val = if success { output } else { "-".to_string() };
+                        if self.git_branch != new_val {
+                            changed = true;
+                            self.git_branch = new_val;
+                        }
+                    },
+                    Some("git_commit") => {
+                        let new_val = if success { output } else { "-".to_string() };
+                        if self.git_commit != new_val {
+                            changed = true;
+                            self.git_commit = new_val;
+                        }
+                    },
+                    _ => {},
+                }
+                changed
+            },
+            Event::ModeUpdate(mode_info) => {
+                if self.mode_info != mode_info {
+                    self.mode_info = mode_info;
+                    return true;
+                }
+                false
+            },
+            _ => false,
+        }
+    }
+
+    fn pipe(&mut self, pipe_message: PipeMessage) -> bool {
+        if pipe_message.name == "toggle" {
+            self.visible = !self.visible;
+            if self.visible {
+                self.update_cwd();
+                self.read_work_file();
+                self.read_git_branch();
+                self.read_git_commit();
+            }
+            return true;
+        }
+        false
+    }
+
+    fn render(&mut self, _rows: usize, cols: usize) {
+        if !self.visible {
+            return;
+        }
+
+        // Left side: ZZZ + specrate ribbons
+        let zzz_label = " ZZZ";
+        let id_text = format!("ID {}", self.change_id);
+        let ticket_text = format!("Ticket {}", self.ticket);
+        let state_text = format!("State {}", self.change_state);
+        let left_width = zzz_label.chars().count()
+            + id_text.chars().count() + 4
+            + ticket_text.chars().count() + 4
+            + state_text.chars().count() + 4;
+        let left = format!(
+            "{}{}",
+            serialize_text(&Text::new(zzz_label).opaque()),
+            serialize_ribbon_line(vec![
+                Text::new(id_text).color_range(0, 3..),
+                Text::new(ticket_text).color_range(0, 7..),
+                Text::new(state_text).color_range(0, 6..),
+            ]),
+        );
+
+        // Right side: Git + Branch/Commit ribbons
+        let git_label = " Git";
+        let branch_text = format!("Branch {}", self.git_branch);
+        let commit_text = format!("Commit {}", self.git_commit);
+        let right_width = git_label.chars().count()
+            + branch_text.chars().count() + 4
+            + commit_text.chars().count() + 4;
+        let right = format!(
+            "{}{}",
+            serialize_text(&Text::new(git_label).opaque()),
+            serialize_ribbon_line(vec![
+                Text::new(branch_text).color_range(0, 7..),
+                Text::new(commit_text).color_range(0, 7..),
+            ]),
+        );
+
+        // Padding between left and right
+        let padding_len = cols.saturating_sub(left_width + right_width);
+        let padding = " ".repeat(padding_len);
+        let padding = serialize_text(&Text::new(padding).opaque());
+
+        print!("{}{}{}", left, padding, right);
+    }
+}
+
+impl State {
+    fn update_cwd(&mut self) {
+        if let Ok((_tab_index, pane_id)) = get_focused_pane_info() {
+            if let Ok(cwd) = get_pane_cwd(pane_id) {
+                self.cwd = Some(cwd);
+            }
+        }
+    }
+
+    fn run_cmd(&self, cmd: &[&str], context: BTreeMap<String, String>) {
+        if let Some(cwd) = &self.cwd {
+            run_command_with_env_variables_and_cwd(
+                cmd,
+                BTreeMap::new(),
+                cwd.clone(),
+                context,
+            );
+        } else {
+            run_command(cmd, context);
+        }
+    }
+
+    fn read_work_file(&self) {
+        let mut ctx = BTreeMap::new();
+        ctx.insert("type".to_string(), "work".to_string());
+        self.run_cmd(&["cat", ".specrate/work"], ctx);
+    }
+
+    fn read_ticket_file(&self, change_id: &str) {
+        let mut ctx = BTreeMap::new();
+        ctx.insert("type".to_string(), "ticket".to_string());
+        let path = format!(".specrate/changes/{}/ticket", change_id);
+        self.run_cmd(&["cat", &path], ctx);
+    }
+
+    fn read_state_file(&self, change_id: &str) {
+        let mut ctx = BTreeMap::new();
+        ctx.insert("type".to_string(), "state".to_string());
+        let path = format!(".specrate/changes/{}/state", change_id);
+        self.run_cmd(&["cat", &path], ctx);
+    }
+
+    fn read_git_branch(&self) {
+        let mut ctx = BTreeMap::new();
+        ctx.insert("type".to_string(), "git_branch".to_string());
+        self.run_cmd(&["git", "rev-parse", "--abbrev-ref", "HEAD"], ctx);
+    }
+
+    fn read_git_commit(&self) {
+        let mut ctx = BTreeMap::new();
+        ctx.insert("type".to_string(), "git_commit".to_string());
+        self.run_cmd(&["git", "rev-parse", "--short", "HEAD"], ctx);
+    }
+}
