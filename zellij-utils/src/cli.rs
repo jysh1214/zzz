@@ -35,13 +35,13 @@ fn validate_session(name: &str) -> Result<String, String> {
 }
 
 #[derive(Parser, Default, Debug, Clone, Serialize, Deserialize)]
-#[clap(version, name = "zellij")]
+#[clap(version, name = "zzz")]
 pub struct CliArgs {
     /// Maximum panes on screen, caution: opening more panes will close old ones
     #[clap(long, value_parser)]
     pub max_panes: Option<usize>,
 
-    /// Change where zellij looks for plugins
+    /// Change where zzz looks for plugins
     #[clap(long, value_parser, overrides_with = "data_dir")]
     pub data_dir: Option<PathBuf>,
 
@@ -70,11 +70,11 @@ pub struct CliArgs {
     #[clap(short, long, value_parser, overrides_with = "new_session_with_layout")]
     pub new_session_with_layout: Option<PathBuf>,
 
-    /// Change where zellij looks for the configuration file
+    /// Change where zzz looks for the configuration file
     #[clap(short, long, overrides_with = "config", env = ZELLIJ_CONFIG_FILE_ENV, value_parser)]
     pub config: Option<PathBuf>,
 
-    /// Change where zellij looks for the configuration directory
+    /// Change where zzz looks for the configuration directory
     #[clap(long, overrides_with = "config_dir", env = ZELLIJ_CONFIG_DIR_ENV, value_parser)]
     pub config_dir: Option<PathBuf>,
 
@@ -105,11 +105,11 @@ impl CliArgs {
 
 #[derive(Debug, Subcommand, Clone, Serialize, Deserialize)]
 pub enum Command {
-    /// Change the behaviour of zellij
+    /// Change the behaviour of zzz
     #[clap(name = "options", value_parser)]
     Options(Options),
 
-    /// Setup zellij and check its configuration
+    /// Setup zzz and check its configuration
     #[clap(name = "setup", value_parser)]
     Setup(Setup),
 
@@ -122,7 +122,7 @@ pub enum Command {
     #[clap(subcommand)]
     Action(Box<CliAction>),
 
-    /// Explore existing zellij sessions
+    /// Explore existing zzz sessions
     #[clap(flatten)]
     Sessions(Sessions),
 
@@ -277,7 +277,7 @@ impl WebCli {
 
 #[derive(Debug, Subcommand, Clone, Serialize, Deserialize)]
 pub enum SessionCommand {
-    /// Change the behaviour of zellij
+    /// Change the behaviour of zzz
     #[clap(name = "options")]
     Options(Options),
 }
@@ -321,7 +321,7 @@ pub enum Sessions {
         #[clap(long, value_parser)]
         index: Option<usize>,
 
-        /// Change the behaviour of zellij
+        /// Change the behaviour of zzz
         #[clap(subcommand, name = "options")]
         options: Option<Box<SessionCommand>>,
 
@@ -679,19 +679,19 @@ pub enum Sessions {
     /// Send data to one or more plugins, launch them if they are not running.
     #[clap(override_usage(
 r#"
-zellij pipe [OPTIONS] [--] <PAYLOAD>
+zzz pipe [OPTIONS] [--] <PAYLOAD>
 
 * Send data to a specific plugin:
 
-zellij pipe --plugin file:/path/to/my/plugin.wasm --name my_pipe_name -- my_arbitrary_data
+zzz pipe --plugin file:/path/to/my/plugin.wasm --name my_pipe_name -- my_arbitrary_data
 
 * To all running plugins (that are listening):
 
-zellij pipe --name my_pipe_name -- my_arbitrary_data
+zzz pipe --name my_pipe_name -- my_arbitrary_data
 
 * Pipe data into this command's STDIN and get output from the plugin on this command's STDOUT
 
-tail -f /tmp/my-live-logfile | zellij pipe --name logs --plugin https://example.com/my-plugin.wasm | wc -l
+tail -f /tmp/my-live-logfile | zzz pipe --name logs --plugin https://example.com/my-plugin.wasm | wc -l
 "#))]
     Pipe {
         /// The name of the pipe
@@ -1044,7 +1044,7 @@ pub enum CliAction {
         )]
         tab_id: Option<usize>,
     },
-    /// Open the specified file in a new zellij pane with your default EDITOR
+    /// Open the specified file in a new zzz pane with your default EDITOR
     /// Returns: Created pane ID (format: terminal_<id>)
     Edit {
         file: PathBuf,
@@ -1428,19 +1428,19 @@ pub enum CliAction {
     /// Send data to one or more plugins, launch them if they are not running.
     #[clap(override_usage(
 r#"
-zellij action pipe [OPTIONS] [--] <PAYLOAD>
+zzz action pipe [OPTIONS] [--] <PAYLOAD>
 
 * Send data to a specific plugin:
 
-zellij action pipe --plugin file:/path/to/my/plugin.wasm --name my_pipe_name -- my_arbitrary_data
+zzz action pipe --plugin file:/path/to/my/plugin.wasm --name my_pipe_name -- my_arbitrary_data
 
 * To all running plugins (that are listening):
 
-zellij action pipe --name my_pipe_name -- my_arbitrary_data
+zzz action pipe --name my_pipe_name -- my_arbitrary_data
 
 * Pipe data into this command's STDIN and get output from the plugin on this command's STDOUT
 
-tail -f /tmp/my-live-logfile | zellij action pipe --name logs --plugin https://example.com/my-plugin.wasm | wc -l
+tail -f /tmp/my-live-logfile | zzz action pipe --name logs --plugin https://example.com/my-plugin.wasm | wc -l
 "#))]
     Pipe {
         /// The name of the pipe
@@ -1576,7 +1576,7 @@ tail -f /tmp/my-live-logfile | zellij action pipe --name logs --plugin https://e
     /// plugin_1) or bare integers in which case they'll be considered terminals (eg. 1 is
     /// the equivalent of terminal_1)
     ///
-    /// Example: zellij action stack-panes -- terminal_1 plugin_2 3
+    /// Example: zzz action stack-panes -- terminal_1 plugin_2 3
     StackPanes {
         #[clap(last(true), required(true))]
         pane_ids: Vec<String>,

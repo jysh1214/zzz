@@ -323,7 +323,7 @@ fn spawn_web_server(cli_args: &CliArgs) -> Result<String, String> {
 #[cfg(not(feature = "web_server_capability"))]
 fn spawn_web_server(_cli_args: &CliArgs) -> Result<String, String> {
     log::error!(
-        "This version of Zellij was compiled without web server support, cannot run web server!"
+        "This version of Zzz was compiled without web server support, cannot run web server!"
     );
     Ok("".to_owned())
 }
@@ -631,7 +631,7 @@ pub fn start_remote_client(
     insecure: bool,
     async_worker_tasks: Option<usize>,
 ) -> Result<Option<ConnectToSession>, RemoteClientError> {
-    info!("Starting Zellij client!");
+    info!("Starting Zzz client!");
 
     let runtime = crate::async_runtime(async_worker_tasks);
 
@@ -702,7 +702,7 @@ pub fn start_remote_client(
         connections,
     ))?;
 
-    let exit_msg = String::from("Bye from Zellij!");
+    let exit_msg = String::from("Bye from Zzz!");
 
     if reconnect_to_session.is_none() {
         reset_controlling_terminal_state(exit_msg, 0);
@@ -732,7 +732,7 @@ pub fn start_client(
         start_server_detached(os_input, cli_args, config, config_options, info);
         return None;
     }
-    info!("Starting Zellij client!");
+    info!("Starting Zzz client!");
 
     let explicitly_disable_kitty_keyboard_protocol = config_options
         .support_kitty_keyboard_protocol

@@ -178,7 +178,7 @@ impl App {
                     format!("Release Notes {}", self.zellij_version.borrow()),
                 );
             } else {
-                rename_plugin_pane(own_plugin_id, "About Zellij");
+                rename_plugin_pane(own_plugin_id, "About Zzz");
             }
         }
     }

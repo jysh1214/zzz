@@ -161,9 +161,9 @@ fn print_flag_help_message(
             kdl_config_file_path.set_extension("kdl");
             kdl_explicitly_specified_layout.set_extension("kdl");
             if yaml_config_was_explicitly_set {
-                println!("Since both the YAML config and a YAML layout file were explicitly specified, you'll need to re-run Zellij and point it to the new files:");
+                println!("Since both the YAML config and a YAML layout file were explicitly specified, you'll need to re-run zzz and point it to the new files:");
                 println!(
-                    "\u{1b}[1;33mzellij --config {} --layout {}\u{1b}[m",
+                    "\u{1b}[1;33mzzz --config {} --layout {}\u{1b}[m",
                     kdl_config_file_path
                         .as_path()
                         .as_os_str()
@@ -176,9 +176,9 @@ fn print_flag_help_message(
                         .to_string(),
                 );
             } else {
-                println!("Since a YAML layout was explicitly specified, you'll need to re-run Zellij and point it to the new layout:");
+                println!("Since a YAML layout was explicitly specified, you'll need to re-run zzz and point it to the new layout:");
                 println!(
-                    "\u{1b}[1;33mzellij --layout {}\u{1b}[m",
+                    "\u{1b}[1;33mzzz --layout {}\u{1b}[m",
                     kdl_explicitly_specified_layout
                         .as_path()
                         .as_os_str()
@@ -191,9 +191,9 @@ fn print_flag_help_message(
             if yaml_config_was_explicitly_set {
                 let mut kdl_config_file_path = yaml_config_file.clone();
                 kdl_config_file_path.set_extension("kdl");
-                println!("Since the YAML config was explicitly specified, you'll need to re-run Zellij and point it to the new config:");
+                println!("Since the YAML config was explicitly specified, you'll need to re-run zzz and point it to the new config:");
                 println!(
-                    "\u{1b}[1;33mzellij --config {}\u{1b}[m",
+                    "\u{1b}[1;33mzzz --config {}\u{1b}[m",
                     kdl_config_file_path
                         .as_path()
                         .as_os_str()
@@ -313,7 +313,7 @@ fn convert_yaml(
     } else if yaml_config_file_exists && new_config_file_exists && yaml_config_was_explicitly_set {
         return Err(
             format!(
-                "Specified old YAML format config (--config {}) but a new KDL file exists in that location. To fix, point to it the new file instead: zellij --config {}",
+                "Specified old YAML format config (--config {}) but a new KDL file exists in that location. To fix, point to it the new file instead: zzz --config {}",
                 yaml_config_file.as_path().as_os_str().to_string_lossy().to_string(),
                 new_config_file.as_path().as_os_str().to_string_lossy().to_string()
             )
@@ -324,7 +324,7 @@ fn convert_yaml(
         explicitly_set_layout_file_kdl_equivalent.set_extension("kdl");
         return Err(
             format!(
-                "Specified old YAML format layout (--layout {}) but a new KDL file exists in that location. To fix, point to it the new file instead: zellij --layout {}",
+                "Specified old YAML format layout (--layout {}) but a new KDL file exists in that location. To fix, point to it the new file instead: zzz --layout {}",
                 explicitly_set_layout_file.display(),
                 explicitly_set_layout_file_kdl_equivalent.display()
             )
