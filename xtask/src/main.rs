@@ -87,7 +87,7 @@ fn workspace_members() -> &'static Vec<WorkspaceMember> {
                 build: true,
             },
             WorkspaceMember {
-                crate_name: "default-plugins/zzz-status-bar",
+                crate_name: "default-plugins/tequila-status-bar",
                 build: true,
             },
             WorkspaceMember {
