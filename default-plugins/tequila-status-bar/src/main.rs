@@ -5,7 +5,7 @@ use zellij_tile::prelude::*;
 #[derive(Default)]
 struct State {
     visible: bool,
-    change_id: String,
+    task_id: String,
     ticket: String,
     change_state: String,
     git_branch: String,
@@ -18,7 +18,7 @@ register_plugin!(State);
 
 impl ZellijPlugin for State {
     fn load(&mut self, _configuration: BTreeMap<String, String>) {
-        self.visible = false;
+        self.visible = true;
         set_selectable(false);
         subscribe(&[
             EventType::Timer,
@@ -48,12 +48,12 @@ impl ZellijPlugin for State {
             },
             Event::FileSystemCreate(paths) | Event::FileSystemUpdate(paths) => {
                 if self.visible {
-                    let specrate = Self::has_specrate_path(&paths);
+                    let tequila = Self::has_tequila_path(&paths);
                     let git = Self::has_git_path(&paths);
-                    if specrate && git {
+                    if tequila && git {
                         self.refresh_all();
-                    } else if specrate {
-                        self.refresh_specrate();
+                    } else if tequila {
+                        self.refresh_tequila();
                     } else if git {
                         self.refresh_git();
                     }
@@ -67,17 +67,17 @@ impl ZellijPlugin for State {
                 match context.get("type").map(|s| s.as_str()) {
                     Some("work") => {
                         if success {
-                            if self.change_id != output {
+                            if self.task_id != output {
                                 changed = true;
-                                self.change_id = output.clone();
+                                self.task_id = output.clone();
                             }
                             self.read_ticket_file(&output);
                             self.read_state_file(&output);
                         } else {
-                            changed = self.change_id != "-"
+                            changed = self.task_id != "-"
                                 || self.ticket != "-"
                                 || self.change_state != "-";
-                            self.change_id = "-".to_string();
+                            self.task_id = "-".to_string();
                             self.ticket = "-".to_string();
                             self.change_state = "-".to_string();
                         }
@@ -141,9 +141,9 @@ impl ZellijPlugin for State {
             return;
         }
 
-        // Left side: ZZZ + specrate ribbons
-        let zzz_label = " ZZZ";
-        let id_text = format!("ID {}", self.change_id);
+        // Left side: Task + tequila ribbons
+        let zzz_label = " Task";
+        let id_text = format!("ID {}", self.task_id);
         let ticket_text = format!("Ticket {}", self.ticket);
         let state_text = format!("State {}", self.change_state);
         let left_width = zzz_label.chars().count()
@@ -186,10 +186,10 @@ impl ZellijPlugin for State {
 }
 
 impl State {
-    fn has_specrate_path(paths: &[(PathBuf, Option<FileMetadata>)]) -> bool {
+    fn has_tequila_path(paths: &[(PathBuf, Option<FileMetadata>)]) -> bool {
         paths.iter().any(|(p, _)| {
             let s = p.to_string_lossy();
-            s.contains(".specrate/work") || s.contains(".specrate/changes/")
+            s.contains(".tequila/work") || s.contains(".tequila/tasks/")
         })
     }
 
@@ -206,7 +206,7 @@ impl State {
         self.read_git_commit();
     }
 
-    fn refresh_specrate(&mut self) {
+    fn refresh_tequila(&mut self) {
         self.update_cwd();
         self.read_work_file();
     }
@@ -241,20 +241,20 @@ impl State {
     fn read_work_file(&self) {
         let mut ctx = BTreeMap::new();
         ctx.insert("type".to_string(), "work".to_string());
-        self.run_cmd(&["cat", ".specrate/work"], ctx);
+        self.run_cmd(&["cat", ".tequila/work"], ctx);
     }
 
-    fn read_ticket_file(&self, change_id: &str) {
+    fn read_ticket_file(&self, task_id: &str) {
         let mut ctx = BTreeMap::new();
         ctx.insert("type".to_string(), "ticket".to_string());
-        let path = format!(".specrate/changes/{}/ticket", change_id);
+        let path = format!(".tequila/tasks/{}/ticket", task_id);
         self.run_cmd(&["cat", &path], ctx);
     }
 
-    fn read_state_file(&self, change_id: &str) {
+    fn read_state_file(&self, task_id: &str) {
         let mut ctx = BTreeMap::new();
         ctx.insert("type".to_string(), "state".to_string());
-        let path = format!(".specrate/changes/{}/state", change_id);
+        let path = format!(".tequila/tasks/{}/state", task_id);
         self.run_cmd(&["cat", &path], ctx);
     }
 

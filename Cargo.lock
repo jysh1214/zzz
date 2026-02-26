@@ -3798,6 +3798,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "tequila-status-bar"
+version = "0.1.0"
+dependencies = [
+ "zellij-tile",
+]
+
+[[package]]
 name = "termcolor"
 version = "1.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5639,11 +5646,4 @@ dependencies = [
  "zellij-client",
  "zellij-server",
  "zellij-utils",
-]
-
-[[package]]
-name = "zzz-status-bar"
-version = "0.1.0"
-dependencies = [
- "zellij-tile",
 ]
