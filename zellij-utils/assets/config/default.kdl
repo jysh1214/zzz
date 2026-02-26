@@ -247,7 +247,7 @@ plugins {
     configuration location="zellij:configuration"
     plugin-manager location="zellij:plugin-manager"
     about location="zellij:about"
-    zzz-status-bar location="zellij:zzz-status-bar"
+    tequila-status-bar location="zellij:tequila-status-bar"
 }
 
 // Plugins to load in the background when a new session starts
