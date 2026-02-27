@@ -41,7 +41,7 @@ impl ZellijPlugin for State {
                 false
             },
             Event::PaneUpdate(_) => {
-                if self.visible {
+                if self.visible && self.cwd_changed() {
                     self.refresh_all();
                 }
                 false
@@ -215,6 +215,18 @@ impl State {
         self.update_cwd();
         self.read_git_branch();
         self.read_git_commit();
+    }
+
+    fn cwd_changed(&mut self) -> bool {
+        if let Ok((_tab_index, pane_id)) = get_focused_pane_info() {
+            if let Ok(cwd) = get_pane_cwd(pane_id) {
+                if self.cwd.as_ref() != Some(&cwd) {
+                    self.cwd = Some(cwd);
+                    return true;
+                }
+            }
+        }
+        false
     }
 
     fn update_cwd(&mut self) {
