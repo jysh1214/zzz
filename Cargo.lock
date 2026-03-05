@@ -3559,6 +3559,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "tequila-review-mode"
+version = "0.1.0"
+dependencies = [
+ "zellij-tile",
+]
+
+[[package]]
 name = "tequila-status-bar"
 version = "0.1.0"
 dependencies = [

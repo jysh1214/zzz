@@ -1,0 +1,8 @@
+[package]
+name = "tequila-review-mode"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+zellij-tile = { path = "../../zellij-tile" }
