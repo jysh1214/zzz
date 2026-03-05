@@ -1,0 +1,16 @@
+// Review mode layout snippet
+// Launch with: zellij action new-pane --floating --plugin tequila-review-mode
+// Or add to your layout KDL:
+layout {
+    pane
+
+    floating_panes {
+        pane {
+            plugin location="tequila-review-mode"
+            x 0
+            y 0
+            width "100%"
+            height "75%"
+        }
+    }
+}

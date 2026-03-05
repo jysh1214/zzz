@@ -1,0 +1,27 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index 1b18db5f..cd468b10 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -53,6 +53,7 @@ members = [
+     "default-plugins/sequence",
+     "default-plugins/layout-manager",
+     "default-plugins/tequila-status-bar",
++    "default-plugins/tequila-review-mode",
+     "zellij-client",
+     "zellij-server",
+     "zellij-utils",
+diff --git a/xtask/src/main.rs b/xtask/src/main.rs
+index a2cc6fea..2e30039b 100644
+--- a/xtask/src/main.rs
++++ b/xtask/src/main.rs
+@@ -90,6 +90,10 @@ fn workspace_members() -> &'static Vec<WorkspaceMember> {
+                 crate_name: "default-plugins/tequila-status-bar",
+                 build: true,
+             },
++            WorkspaceMember {
++                crate_name: "default-plugins/tequila-review-mode",
++                build: true,
++            },
+             WorkspaceMember {
+                 crate_name: "zellij-utils",
+                 build: false,
