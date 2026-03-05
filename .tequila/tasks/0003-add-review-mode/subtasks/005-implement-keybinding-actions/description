@@ -1,0 +1,15 @@
+Wire up keyboard and mouse input handling in the `update()` method for all interactive actions.
+
+Subscribe to `EventType::Mouse` in addition to `EventType::Key`.
+
+Keybindings:
+- `a` — Approve: run `sh -c "echo APPROVED > .tequila/tasks/{task-id}/subtasks/{name}/state"` via `run_command`, update local state to reflect approval
+- Left arrow — Previous patch: decrement `current_index` (wrapping), load the previous subtask's patch file
+- Right arrow — Next patch: increment `current_index` (wrapping), load the next subtask's patch file via `run_command` with `cat`
+- `q` — Close the plugin pane (via `close_self()` or `close_focused_pane()`)
+
+Mouse:
+- ScrollUp — Scroll up
+- ScrollDown — Scroll down
+
+Reset `scroll_offset` to 0 when switching patches. Show a brief "Approved!" flash in the header after approving.

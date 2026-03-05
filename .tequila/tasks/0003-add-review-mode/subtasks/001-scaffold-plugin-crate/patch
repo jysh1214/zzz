@@ -1,0 +1,30 @@
+diff --git a/default-plugins/tequila-review-mode/Cargo.toml b/default-plugins/tequila-review-mode/Cargo.toml
+new file mode 100644
+index 00000000..0eef458d
+--- /dev/null
++++ b/default-plugins/tequila-review-mode/Cargo.toml
+@@ -0,0 +1,8 @@
++[package]
++name = "tequila-review-mode"
++version = "0.1.0"
++edition.workspace = true
++license.workspace = true
++
++[dependencies]
++zellij-tile = { path = "../../zellij-tile" }
+diff --git a/default-plugins/tequila-review-mode/.cargo/config.toml b/default-plugins/tequila-review-mode/.cargo/config.toml
+new file mode 100644
+index 00000000..7ab323c7
+--- /dev/null
++++ b/default-plugins/tequila-review-mode/.cargo/config.toml
+@@ -0,0 +1,2 @@
++[build]
++target = "wasm32-wasip1"
+diff --git a/default-plugins/tequila-review-mode/LICENSE.md b/default-plugins/tequila-review-mode/LICENSE.md
+new file mode 120000
+index 00000000..f0608a63
+--- /dev/null
++++ b/default-plugins/tequila-review-mode/LICENSE.md
+@@ -0,0 +1 @@
++../../LICENSE.md
+\ No newline at end of file

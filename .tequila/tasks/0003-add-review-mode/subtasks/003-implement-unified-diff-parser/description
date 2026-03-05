@@ -1,0 +1,21 @@
+Implement a unified diff parser that converts raw patch text into a structured representation suitable for side-by-side rendering.
+
+Parse the unified diff format:
+- Detect file headers (`--- a/path` and `+++ b/path`)
+- Parse hunk headers (`@@ -old_start,old_count +new_start,new_count @@`)
+- Classify lines: context (starts with ` `), addition (starts with `+`), deletion (starts with `-`)
+
+Output data structure per file in the diff:
+```
+DiffFile { old_path, new_path, hunks: Vec<DiffHunk> }
+DiffHunk { old_start, new_start, lines: Vec<DiffLine> }
+DiffLine { kind: Context|Add|Delete, content: String }
+```
+
+Then produce a side-by-side line mapping:
+- Context lines appear on both sides
+- Deletions appear on the left only (right side blank)
+- Additions appear on the right only (left side blank)
+- Adjacent deletion+addition blocks are paired line-by-line
+
+This is a pure data transformation module (`src/diff.rs`) with no plugin API dependencies.

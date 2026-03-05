@@ -1,0 +1,11 @@
+Create the `default-plugins/tequila-review-mode/` crate with the minimal plugin skeleton.
+
+Files to create:
+- `default-plugins/tequila-review-mode/Cargo.toml` — depends on `zellij-tile` (path dep)
+- `default-plugins/tequila-review-mode/.cargo/config.toml` — sets `target = "wasm32-wasip1"`
+- `default-plugins/tequila-review-mode/src/main.rs` — defines a `State` struct implementing `ZellijPlugin` with stub `load`, `update`, and `render` methods; uses `register_plugin!` macro
+- `default-plugins/tequila-review-mode/LICENSE.md` — symlink to `../../LICENSE.md`
+
+In `load()`: request permissions (`RunCommands`, `ChangeApplicationState`) and subscribe to events (`Key`, `RunCommandResult`, `PermissionRequestResult`).
+
+This subtask produces the compilable skeleton only — no business logic yet.
