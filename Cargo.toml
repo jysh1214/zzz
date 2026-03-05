@@ -55,6 +55,7 @@ members = [
     "default-plugins/layout-manager",
     "default-plugins/link",
     "default-plugins/tequila-status-bar",
+    "default-plugins/tequila-review-mode",
     "zellij-client",
     "zellij-server",
     "zellij-utils",
