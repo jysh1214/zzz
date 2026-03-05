@@ -27,7 +27,6 @@ pub enum KeyAction {
     Session,
     Move,
     Tmux,
-    Zzz,
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -55,7 +54,6 @@ impl KeyShortcut {
             KeyAction::Session => String::from("SESSION"),
             KeyAction::Move => String::from("MOVE"),
             KeyAction::Tmux => String::from("TMUX"),
-            KeyAction::Zzz => String::from("ZZZ"),
         }
     }
     pub fn with_shortened_modifiers(&self, common_modifiers: &Vec<KeyModifier>) -> String {
@@ -114,7 +112,6 @@ impl KeyShortcut {
             KeyAction::Session => String::from("Se"),
             KeyAction::Move => String::from("Mo"),
             KeyAction::Tmux => String::from("Tm"),
-            KeyAction::Zzz => String::from("Zz"),
         }
     }
 }
@@ -694,11 +691,6 @@ pub fn first_line(
             KeyMode::UnselectedAlternate,
             KeyAction::Quit,
             to_char(action_key(binds, &[Action::Quit])),
-        ),
-        KeyShortcut::new(
-            KeyMode::Unselected,
-            KeyAction::Zzz,
-            Some(KeyWithModifier::new(BareKey::Char('z')).with_ctrl_modifier()),
         ),
     ];
 
