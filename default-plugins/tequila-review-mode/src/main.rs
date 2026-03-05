@@ -312,8 +312,10 @@ impl State {
                 ".tequila/tasks/{}/subtasks/{}/state",
                 self.task_id, subtask.name
             );
-            let cmd_str = format!("echo APPROVED > {}", path);
-            self.run_cmd(&["sh", "-c", &cmd_str], ctx);
+            self.run_cmd(
+                &["sh", "-c", "echo APPROVED > \"$1\"", "--", &path],
+                ctx,
+            );
         }
     }
 
@@ -326,8 +328,7 @@ impl State {
                 ".tequila/tasks/{}/subtasks/{}/state",
                 self.task_id, subtask.name
             );
-            let cmd_str = format!("rm -f {}", path);
-            self.run_cmd(&["sh", "-c", &cmd_str], ctx);
+            self.run_cmd(&["rm", "-f", &path], ctx);
         }
     }
 
