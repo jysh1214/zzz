@@ -1,0 +1,14 @@
+fix: eliminate command injection in review-mode approve/cancel
+
+Replace shell-interpolated commands in approve_current and
+cancel_approve_current with safe argument passing.
+
+- approve_current: pass path as a positional argument to sh -c
+  ("echo APPROVED > \"$1\"") instead of interpolating into the
+  command string
+- cancel_approve_current: use ["rm", "-f", &path] directly,
+  bypassing the shell entirely
+
+Previously, task_id and subtask.name (sourced from filesystem reads)
+were interpolated into sh -c command strings, allowing a crafted
+directory name with shell metacharacters to execute arbitrary commands.
