@@ -1,0 +1,19 @@
+Implement the `render()` method that draws the side-by-side diff view.
+
+Layout (given `rows` and `cols` from render arguments):
+- Row 0: Header bar — subtask name, index (e.g., "1/5"), and approval status
+- Row 1: File path header (one per file, rendered as separator when scrolling through)
+- Rows 2..rows-2: Two-column diff view
+  - Left column: old version (width = (cols-3)/2), lines prefixed with `-` for deletions
+  - Separator: ` │ ` (3 chars)
+  - Right column: new version (width = remaining), lines prefixed with `+` for additions
+- Last row: Key hints — `[a] Approve  [←/→] Prev/Next  [scroll] Mouse  [q] Quit`
+
+Color scheme (ANSI escape codes):
+- Deletions: red foreground (`\x1b[31m`) with `-` prefix
+- Additions: green foreground (`\x1b[32m`) with `+` prefix
+- Context lines: default foreground, space prefix
+- Header/file paths: bold (`\x1b[1m`)
+- Approved badge: green background
+
+Scrolling: track `scroll_offset` in state; render only lines `scroll_offset..scroll_offset+visible_rows`. Clamp to bounds.

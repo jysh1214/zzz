@@ -1,0 +1,19 @@
+Implement the data-loading layer that discovers the active task and its subtask patches.
+
+On load (after permissions granted):
+1. Run `cat .tequila/work` to get the active task ID.
+2. Run `ls .tequila/tasks/{task-id}/subtasks/` to discover subtask directories.
+3. Sort directories by name (they are zero-padded index prefixed) and store the list.
+4. Read the first subtask's `patch` file via `cat .tequila/tasks/{task-id}/subtasks/{name}/patch`.
+5. Read each subtask's `state` file to show approval status.
+
+Handle `RunCommandResult` events by matching on the `context` map to dispatch results to the appropriate state fields. Use context keys like `type=work`, `type=ls-subtasks`, `type=read-patch`, `type=read-state`.
+
+Error handling: if any step fails (non-zero exit code, empty output) — e.g., `.tequila/work` missing, task directory not found, no subtasks with patch files — set `no_patches: true` in state. The renderer will display "NO PATCHES TO REVIEW" centered in the pane.
+
+State fields to add:
+- `task_id: String`
+- `subtasks: Vec<SubtaskInfo>` (name, patch content, approval state)
+- `current_index: usize`
+- `loading: bool`
+- `no_patches: bool`

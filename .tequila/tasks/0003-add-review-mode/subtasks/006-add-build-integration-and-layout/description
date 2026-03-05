@@ -1,0 +1,18 @@
+Register the new plugin in the build system and provide a KDL layout snippet.
+
+Build integration:
+- Add `"default-plugins/tequila-review-mode"` to workspace members in root `Cargo.toml`
+- Add a `WorkspaceMember` entry in `xtask/src/main.rs` `workspace_members()` function
+
+KDL layout:
+- Create `.tequila/tasks/0003-add-review-mode/review-layout.kdl` as a reference layout snippet showing how to launch the plugin as a pinned floating pane:
+  - Positioned at top: `y 0`
+  - Height ~75%: `height "75%"`
+  - Full width: `width "100%"`
+  - This leaves the bottom ~25% visible for the Claude command line
+
+Keybinding:
+- Add a `tequila-review-mode` plugin alias in the `plugins` section of `~/.config/zellij/config.kdl`
+- Bind `Alt+V` in `shared_except "locked"` to `LaunchOrFocusPlugin "tequila-review-mode"` with `floating true`
+
+Verify the plugin compiles with `cargo xtask build`.
