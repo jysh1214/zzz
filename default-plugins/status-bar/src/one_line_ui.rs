@@ -155,11 +155,6 @@ fn base_mode_locked_mode_indicators(help: &ModeInfo) -> HashMap<InputMode, Vec<K
                     KeyAction::Quit,
                     to_char(action_key(normal_binds, &[Action::Quit])),
                 ),
-                KeyShortcut::new(
-                    KeyMode::Unselected,
-                    KeyAction::Zzz,
-                    Some(KeyWithModifier::new(BareKey::Char('z')).with_ctrl_modifier()),
-                ),
             ],
         ),
         (
@@ -415,11 +410,6 @@ fn base_mode_normal_mode_indicators(help: &ModeInfo) -> HashMap<InputMode, Vec<K
                     KeyMode::UnselectedAlternate,
                     KeyAction::Quit,
                     to_char(action_key(normal_binds, &[Action::Quit])),
-                ),
-                KeyShortcut::new(
-                    KeyMode::Unselected,
-                    KeyAction::Zzz,
-                    Some(KeyWithModifier::new(BareKey::Char('z')).with_ctrl_modifier()),
                 ),
             ],
         ),
