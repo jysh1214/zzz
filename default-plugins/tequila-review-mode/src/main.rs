@@ -392,7 +392,7 @@ impl State {
 // --- Renderer (subtask 004) ---
 
 impl State {
-    fn render_diff(&self, rows: usize, cols: usize) {
+    fn render_diff(&mut self, rows: usize, cols: usize) {
         let subtask = &self.subtasks[self.current_index];
         let parsed = diff::parse_patch(&subtask.patch_content);
         let side_by_side = diff::to_side_by_side(&parsed);
@@ -456,6 +456,7 @@ impl State {
         let visible_rows = rows.saturating_sub(overhead);
         let max_scroll = lines.len().saturating_sub(visible_rows);
         let scroll = self.scroll_offset.min(max_scroll);
+        self.scroll_offset = scroll;
 
         let half_width = cols.saturating_sub(3) / 2;
         let end = lines.len().min(scroll + visible_rows);
