@@ -1,0 +1,11 @@
+Clamp scroll_offset to max_scroll during rendering so scroll-up responds immediately.
+
+In `default-plugins/tequila-review-mode/src/main.rs`, the `render_diff` method computed
+`let scroll = self.scroll_offset.min(max_scroll)` but never wrote the clamped value back.
+This meant `self.scroll_offset` could grow far beyond `max_scroll` when pressing Down/PageDown,
+and pressing Up/PageUp only subtracted 1 each time — the view stayed stuck at the bottom until
+`scroll_offset` dropped below `max_scroll`.
+
+Actual changes:
+1. Changed `render_diff(&self, ...)` to `render_diff(&mut self, ...)` (line 395).
+2. Added `self.scroll_offset = scroll;` after computing the clamped value (line 459).
