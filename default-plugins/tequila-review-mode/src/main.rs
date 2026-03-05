@@ -419,6 +419,25 @@ impl State {
         );
         print!("\x1b[1;1H{}", header);
 
+        // Row 2+: Description block (dimmed, word-wrapped)
+        let desc_lines = wrap_text(&subtask.description, cols.saturating_sub(2));
+        let desc_row_count = desc_lines.len();
+        for (i, line) in desc_lines.iter().enumerate() {
+            print!(
+                "\x1b[{};1H\x1b[K \x1b[2m{}\x1b[0m",
+                i + 2,
+                truncate_or_pad(line, cols.saturating_sub(1)),
+            );
+        }
+        // Separator line below description
+        let sep_row = 2 + desc_row_count;
+        print!(
+            "\x1b[{};1H\x1b[K\x1b[2m{}\x1b[0m",
+            sep_row,
+            "\u{2500}".repeat(cols),
+        );
+        let diff_start_row = sep_row + 1;
+
         // Collect all renderable lines
         let mut lines: Vec<diff::SideBySideLine> = Vec::new();
         for file in &side_by_side {
@@ -432,7 +451,9 @@ impl State {
             lines.extend(file.lines.iter().cloned());
         }
 
-        let visible_rows = rows.saturating_sub(3);
+        // 1 header + desc_row_count + 1 separator + 1 footer = overhead
+        let overhead = 1 + desc_row_count + 1 + 1;
+        let visible_rows = rows.saturating_sub(overhead);
         let max_scroll = lines.len().saturating_sub(visible_rows);
         let scroll = self.scroll_offset.min(max_scroll);
 
@@ -441,7 +462,7 @@ impl State {
         let visible_lines = &lines[scroll..end];
 
         for (i, line) in visible_lines.iter().enumerate() {
-            let row = i + 2;
+            let row = diff_start_row + i;
             print!("\x1b[{};1H\x1b[K", row);
 
             if line.is_file_header {
@@ -471,7 +492,7 @@ impl State {
 
         // Clear remaining lines
         for i in visible_lines.len()..visible_rows {
-            let row = i + 2;
+            let row = diff_start_row + i;
             print!("\x1b[{};1H\x1b[K", row);
         }
 
@@ -484,6 +505,51 @@ impl State {
             pad_right(footer, cols)
         );
     }
+}
+
+fn wrap_text(text: &str, width: usize) -> Vec<String> {
+    if text.is_empty() {
+        return vec![String::new()];
+    }
+    let width = width.max(1);
+    let mut result = Vec::new();
+    for line in text.lines() {
+        if line.is_empty() {
+            result.push(String::new());
+            continue;
+        }
+        let mut current = String::new();
+        for word in line.split_whitespace() {
+            if current.is_empty() {
+                if word.len() > width {
+                    // Break long word across lines
+                    let mut chars = word.chars();
+                    while chars.as_str().len() > 0 {
+                        let chunk: String = chars.by_ref().take(width).collect();
+                        if chunk.is_empty() {
+                            break;
+                        }
+                        result.push(chunk);
+                    }
+                } else {
+                    current = word.to_string();
+                }
+            } else if current.len() + 1 + word.len() > width {
+                result.push(current);
+                current = word.to_string();
+            } else {
+                current.push(' ');
+                current.push_str(word);
+            }
+        }
+        if !current.is_empty() {
+            result.push(current);
+        }
+    }
+    if result.is_empty() {
+        result.push(String::new());
+    }
+    result
 }
 
 fn truncate_or_pad(s: &str, width: usize) -> String {
