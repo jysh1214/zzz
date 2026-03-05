@@ -1,0 +1,89 @@
+diff --git a/default-plugins/tequila-review-mode/src/main.rs b/default-plugins/tequila-review-mode/src/main.rs
+index 8c09f665..8f8b55ca 100644
+--- a/default-plugins/tequila-review-mode/src/main.rs
++++ b/default-plugins/tequila-review-mode/src/main.rs
+@@ -21,8 +21,10 @@ struct State {
+ struct SubtaskInfo {
+     name: String,
+     patch_content: String,
++    description: String,
+     approved: bool,
+     patch_loaded: bool,
++    description_loaded: bool,
+ }
+ 
+ register_plugin!(State);
+@@ -144,6 +146,17 @@ impl State {
+         self.run_cmd(&["cat", &path], ctx);
+     }
+ 
++    fn read_description_file(&self, subtask_name: &str) {
++        let mut ctx = BTreeMap::new();
++        ctx.insert("type".to_string(), "read-description".to_string());
++        ctx.insert("name".to_string(), subtask_name.to_string());
++        let path = format!(
++            ".tequila/tasks/{}/subtasks/{}/description",
++            self.task_id, subtask_name
++        );
++        self.run_cmd(&["cat", &path], ctx);
++    }
++
+     fn read_subtask_state(&self, subtask_name: &str) {
+         let mut ctx = BTreeMap::new();
+         ctx.insert("type".to_string(), "read-state".to_string());
+@@ -198,6 +211,7 @@ impl State {
+                     }
+                     for subtask in &self.subtasks {
+                         self.read_patch_file(&subtask.name);
++                        self.read_description_file(&subtask.name);
+                         self.read_subtask_state(&subtask.name);
+                     }
+                 } else {
+@@ -215,12 +229,23 @@ impl State {
+                             subtask.patch_content = output;
+                         }
+                     }
+-                    if self.subtasks.iter().all(|s| s.patch_loaded) {
+-                        self.subtasks.retain(|s| !s.patch_content.is_empty());
+-                        self.loading = false;
+-                        if self.subtasks.is_empty() {
+-                            self.no_patches = true;
++                    if self.all_files_loaded() {
++                        self.finish_loading();
++                        return true;
++                    }
++                }
++                false
++            },
++            Some("read-description") => {
++                if let Some(name) = context.get("name") {
++                    if let Some(subtask) = self.subtasks.iter_mut().find(|s| &s.name == name) {
++                        subtask.description_loaded = true;
++                        if success {
++                            subtask.description = output;
+                         }
++                    }
++                    if self.all_files_loaded() {
++                        self.finish_loading();
+                         return true;
+                     }
+                 }
+@@ -261,6 +286,18 @@ impl State {
+             _ => false,
+         }
+     }
++
++    fn all_files_loaded(&self) -> bool {
++        self.subtasks.iter().all(|s| s.patch_loaded && s.description_loaded)
++    }
++
++    fn finish_loading(&mut self) {
++        self.subtasks.retain(|s| !s.patch_content.is_empty());
++        self.loading = false;
++        if self.subtasks.is_empty() {
++            self.no_patches = true;
++        }
++    }
+ }
+ 
+ // --- Keybinding actions (subtask 005) ---
