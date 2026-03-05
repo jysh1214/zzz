@@ -1,0 +1,6 @@
+fix: show commit_message instead of description in review-mode
+
+The tequila convention stores subtask context in a `commit_message`
+file, not `description`. Update the review-mode plugin to read
+`commit_message` and rename the corresponding struct fields and
+handler logic accordingly.
