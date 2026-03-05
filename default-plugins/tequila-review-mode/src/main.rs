@@ -21,10 +21,10 @@ struct State {
 struct SubtaskInfo {
     name: String,
     patch_content: String,
-    description: String,
+    commit_message: String,
     approved: bool,
     patch_loaded: bool,
-    description_loaded: bool,
+    commit_message_loaded: bool,
 }
 
 register_plugin!(State);
@@ -146,12 +146,12 @@ impl State {
         self.run_cmd(&["cat", &path], ctx);
     }
 
-    fn read_description_file(&self, subtask_name: &str) {
+    fn read_commit_message_file(&self, subtask_name: &str) {
         let mut ctx = BTreeMap::new();
-        ctx.insert("type".to_string(), "read-description".to_string());
+        ctx.insert("type".to_string(), "read-commit-message".to_string());
         ctx.insert("name".to_string(), subtask_name.to_string());
         let path = format!(
-            ".tequila/tasks/{}/subtasks/{}/description",
+            ".tequila/tasks/{}/subtasks/{}/commit_message",
             self.task_id, subtask_name
         );
         self.run_cmd(&["cat", &path], ctx);
@@ -211,7 +211,7 @@ impl State {
                     }
                     for subtask in &self.subtasks {
                         self.read_patch_file(&subtask.name);
-                        self.read_description_file(&subtask.name);
+                        self.read_commit_message_file(&subtask.name);
                         self.read_subtask_state(&subtask.name);
                     }
                 } else {
@@ -236,12 +236,12 @@ impl State {
                 }
                 false
             },
-            Some("read-description") => {
+            Some("read-commit-message") => {
                 if let Some(name) = context.get("name") {
                     if let Some(subtask) = self.subtasks.iter_mut().find(|s| &s.name == name) {
-                        subtask.description_loaded = true;
+                        subtask.commit_message_loaded = true;
                         if success {
-                            subtask.description = output;
+                            subtask.commit_message = output;
                         }
                     }
                     if self.all_files_loaded() {
@@ -288,7 +288,7 @@ impl State {
     }
 
     fn all_files_loaded(&self) -> bool {
-        self.subtasks.iter().all(|s| s.patch_loaded && s.description_loaded)
+        self.subtasks.iter().all(|s| s.patch_loaded && s.commit_message_loaded)
     }
 
     fn finish_loading(&mut self) {
@@ -421,7 +421,7 @@ impl State {
         print!("\x1b[1;1H{}", header);
 
         // Row 2+: Description block (dimmed, word-wrapped)
-        let desc_lines = wrap_text(&subtask.description, cols.saturating_sub(2));
+        let desc_lines = wrap_text(&subtask.commit_message, cols.saturating_sub(2));
         let desc_row_count = desc_lines.len();
         for (i, line) in desc_lines.iter().enumerate() {
             print!(
