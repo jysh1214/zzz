@@ -1,0 +1,4 @@
+chore: verify build and tests pass after rebase
+
+Confirmed that cargo xtask build completes successfully after rebasing
+onto latest main.

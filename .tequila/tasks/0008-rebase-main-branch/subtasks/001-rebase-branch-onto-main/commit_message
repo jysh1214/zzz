@@ -1,0 +1,8 @@
+chore: rebase dev/alexchiang/zzz onto latest main
+
+Fetched latest origin/main and rebased 23 commits onto it.
+Resolved conflicts in:
+- zellij-utils/src/cli.rs (kept new Action subcommand from main, applied zzz rename, dropped removed Sequence variant)
+- Cargo.toml, consts.rs, plugins.rs, default.kdl (kept link plugin from main alongside zzz-status-bar/tequila-status-bar)
+- Binary .wasm files (accepted main's versions, removed deleted sequence.wasm)
+- Cargo.lock (regenerated)
